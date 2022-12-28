@@ -1,0 +1,11 @@
+{
+	"ocaml.sandbox": {
+		"kind": "opam",
+		"switch": "C:\\Users\\Miika\\code\\ocaml\\switch"
+	},
+	"editor.tabSize": 2,
+	"editor.rulers": [
+		80
+	],
+	"editor.formatOnSave": true
+}
