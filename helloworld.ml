@@ -32,7 +32,7 @@ let mul_withf i f = int_of_float(float_of_int(i) *. f)
 
 let complexPlane dimx dimy =
   let mat = Array.make_matrix dimx dimy 0 in
-  let mapfunc x col = Array.mapi (fun y _ : Complex.t -> { re = (div_f (x * 3) dimx) -. 2.2; im = div_f (y*3) dimy -. 1.5 }) col in
+  let mapfunc x col = Array.mapi (fun y _ : Complex.t -> { re = (div_f (x-(dimx/2)) dimx) *. 4. -. 0.5; im = (div_f (y-(dimy/2)) dimx) *. 4.}) col in
   Array.mapi mapfunc mat
 
 let mapArr2d f l = Array.map (Array.map f) l
@@ -52,7 +52,7 @@ let pick_color colors v =
 
   (* prevent overflows here *)
   if v <= 2. then black
-  else let v2 = (log10 v) /. 1000. in
+  else let v2 = (log v) /. 10. in
     if v2 >= float_of_int (Array.length colors - 1) then colors.(Array.length colors - 1) 
     else 
     let c1 = colors.(int_of_float v2) in
@@ -60,19 +60,22 @@ let pick_color colors v =
     let (w, _) = Float.modf v2 in
       mix_rbg (get_rgb c1) (get_rgb c2) w |> (fun (r, g, b) -> rgb r g b) 
   
-let colors = [|green; blue; yellow; magenta; cyan; red|]
+let colors = [|red|]
 let pick_and_set_color v = 
  v |> pick_color colors |> set_color 
 
-let max = 100
-let dimx = 1000
-let dimy = 1000
+let max = 20
+let dimx = 1920
+let dimy = 1080
 
 let () =
-  open_graph ((string_of_int dimx) ^ "x" ^ (string_of_int dimy));
+  open_graph "";
+  auto_synchronize false;
+  (* Thread.delay 1.; *)
   let plane = complexPlane dimx dimy in
   (* let pp = iterArr2di (fun _ _ (v: Complex.t) -> Printf.printf "%f;%f " v.re v.im) in *)
   let plane2 = mapArr2d (mandelbrot2 max) plane in
   let drawSet = iterArr2di (fun x y v -> pick_and_set_color v; plot x y) in
   drawSet plane2;
+  synchronize ();
   ignore (wait_next_event [ Key_pressed ])
